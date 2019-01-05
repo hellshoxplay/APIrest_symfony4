@@ -2,41 +2,44 @@
 
 namespace App\Controller;
 
-use App\Entity\Livre;
-use App\Form\LivreType;
-use App\Repository\LivreRepository;
+use App\Entity\Client;
+use App\Form\ClientType;
+use App\Repository\ClientRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Routing\ClassResourceInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 
 /**
- * Class LivreController
+ * Class ClientController
  * @package App\Controller
  * @Rest\RouteResource(
- *     "Livre",
+ *     "Client",
  *     pluralize=false
  * )
  */
-class LivreController extends FOSRestController implements ClassResourceInterface
+class ClientController extends FOSRestController implements ClassResourceInterface
 {
     /**
      * @var EntityManagerInterface
      */
     private $entityManager;
 
-    private $livreRepository;
+    /**
+     * @var ClientRepository
+     */
+    private $clientRepository;
 
     /**
-     * LivreController constructor.
+     * ClientController constructor.
      * @param EntityManagerInterface $entityManager
      */
-    public function __construct (EntityManagerInterface $entityManager, LivreRepository $livreRepository)
+    public function __construct (EntityManagerInterface $entityManager, ClientRepository $clientRepository)
     {
         $this->entityManager = $entityManager;
-        $this->livreRepository=$livreRepository;
+        $this->clientRepository=$clientRepository;
     }
 
 
@@ -46,7 +49,7 @@ class LivreController extends FOSRestController implements ClassResourceInterfac
      */
     public function postAction(Request $request)
     {
-        $form=$this->createForm (LivreType::class, new Livre());
+        $form=$this->createForm (ClientType::class, new Client());
 
         $form->submit ($request->request->all());
 
@@ -60,18 +63,22 @@ class LivreController extends FOSRestController implements ClassResourceInterfac
         $this->entityManager->flush ();
 
         return $this->view (
-                [
-                    'status' =>'ok',
-                ]
-            );
-    }
-
-    public function getAction($id)
-    {
-        return $this->view (
-            $this->livreRepository->find ($id)
+            [
+                'status' =>'ok',
+            ]
         );
     }
 
-}
+    /**
+     * @param $id
+     * @return \FOS\RestBundle\View\View
+     */
+    public function getAction($id)
+    {
+        return $this->view (
+            $this->clientRepository->find ($id)
+        );
+    }
 
+
+}
