@@ -6,3 +6,13 @@ livres :
   type: rest
   resource: App\Controller\LivreController
   prefix: /api
+
+auteurs :
+  type: rest
+  resource: App\Controller\AuteurController
+  prefix: /api
+
+clients:
+  type: rest
+  resource: App\Controller\ClientController
+  prefix: /api

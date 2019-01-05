@@ -2,25 +2,26 @@
 
 namespace App\Form;
 
-use App\Entity\Livre;
+use App\Entity\Client;
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-class LivreType extends AbstractType
+class ClientType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('titre', TextType::class)
+            ->add('nom')
+            ->add('prenom')
+            ->add('dateDeNaissance')
         ;
     }
 
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => Livre::class,
+            'data_class' => Client::class,
         ]);
     }
 }
