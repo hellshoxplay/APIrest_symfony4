@@ -80,5 +80,11 @@ class ClientController extends FOSRestController implements ClassResourceInterfa
         );
     }
 
+    public function cgetAction()
+    {
+        return $this->view (
+            $this->clientRepository->findAll ()
+        );
+    }
 
 }

@@ -73,5 +73,11 @@ class LivreController extends FOSRestController implements ClassResourceInterfac
         );
     }
 
+    public function cgetAction()
+    {
+        return $this->view (
+            $this->livreRepository->findAll ()
+    );
+    }
 }
 
