@@ -2,18 +2,18 @@
 
 namespace App\Controller;
 
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
+use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Routing\ClassResourceInterface;
+use Symfony\Component\HttpFoundation\Request;
 
-class LivreController extends AbstractController
+class LivreController extends FOSRestController implements ClassResourceInterface
 {
     /**
-     * @Route("/livre", name="livre")
+     *
+     *
      */
-    public function index()
+    public function postAction(Request $request)
     {
-        return $this->render('livre/index.html.twig', [
-            'controller_name' => 'LivreController',
-        ]);
+
     }
 }
