@@ -82,6 +82,12 @@ class AuteurController extends FOSRestController implements ClassResourceInterfa
         );
     }
 
+    public function cgetAction()
+    {
+        return $this->view (
+            $this->auteurRepository->findAll ()
+        );
+    }
 
 
 }
