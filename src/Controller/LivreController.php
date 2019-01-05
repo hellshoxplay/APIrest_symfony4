@@ -27,6 +27,9 @@ class LivreController extends FOSRestController implements ClassResourceInterfac
      */
     private $entityManager;
 
+    /**
+     * @var LivreRepository
+     */
     private $livreRepository;
 
     /**
@@ -66,6 +69,10 @@ class LivreController extends FOSRestController implements ClassResourceInterfac
             );
     }
 
+    /**
+     * @param $id
+     * @return \FOS\RestBundle\View\View
+     */
     public function getAction($id)
     {
         return $this->view (
@@ -73,11 +80,37 @@ class LivreController extends FOSRestController implements ClassResourceInterfac
         );
     }
 
+    /**
+     * @return \FOS\RestBundle\View\View
+     */
     public function cgetAction()
     {
         return $this->view (
             $this->livreRepository->findAll ()
     );
     }
+
+    /**
+     * @param Request $request
+     * @param $id
+     * @return \FOS\RestBundle\View\View
+     */
+    public function putAction(Request $request, $id)
+    {
+        $existingLivre=$this->livreRepository->find($id);
+
+        $form=$this->createForm (LivreType::class, $existingLivre);
+        $form->submit ($request->request->all ());
+
+        if(false===$form->isValid ()){
+            return $this->view ($form);
+        }
+
+        $this->entityManager->flush ();
+
+        return $this->view (null, Response::HTTP_NO_CONTENT);
+    }
+
+
 }
 

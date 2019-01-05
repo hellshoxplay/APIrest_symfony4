@@ -82,6 +82,9 @@ class AuteurController extends FOSRestController implements ClassResourceInterfa
         );
     }
 
+    /**
+     * @return \FOS\RestBundle\View\View
+     */
     public function cgetAction()
     {
         return $this->view (
@@ -89,5 +92,26 @@ class AuteurController extends FOSRestController implements ClassResourceInterfa
         );
     }
 
+
+    /**
+     * @param Request $request
+     * @param $id
+     * @return \FOS\RestBundle\View\View
+     */
+    public function putAction(Request $request, $id)
+    {
+        $existingAuteur=$this->auteurRepository->find($id);
+
+        $form=$this->createForm (AuteurType::class, $existingAuteur);
+        $form->submit ($request->request->all ());
+
+        if(false===$form->isValid ()){
+            return $this->view ($form);
+        }
+
+        $this->entityManager->flush ();
+
+        return $this->view (null, Response::HTTP_NO_CONTENT);
+    }
 
 }
