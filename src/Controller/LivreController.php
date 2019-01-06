@@ -6,7 +6,7 @@ use App\Entity\Livre;
 use App\Form\LivreType;
 use App\Repository\LivreRepository;
 use Doctrine\ORM\EntityManagerInterface;
-use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,7 +21,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  *     pluralize=false
  * )
  */
-class LivreController extends FOSRestController implements ClassResourceInterface
+class LivreController extends AbstractFOSRestController implements ClassResourceInterface
 {
     /**
      * @var EntityManagerInterface
@@ -153,7 +153,7 @@ class LivreController extends FOSRestController implements ClassResourceInterfac
      * @param string $id
      * @return \FOS\RestBundle\View\View
      */
-    public function Delete(string $id)
+    public function deleteAction(string $id)
     {
         $livre=$this->findLivreById ($id);
 

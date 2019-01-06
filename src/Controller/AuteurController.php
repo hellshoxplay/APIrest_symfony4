@@ -6,9 +6,9 @@ use App\Entity\Auteur;
 use App\Form\AuteurType;
 use App\Repository\AuteurRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -23,7 +23,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  * )
  *
  */
-class AuteurController extends FOSRestController implements ClassResourceInterface
+class AuteurController extends AbstractFOSRestController implements ClassResourceInterface
 {
     /**
      * @var EntityManagerInterface
@@ -153,7 +153,7 @@ class AuteurController extends FOSRestController implements ClassResourceInterfa
      * @param string $id
      * @return \FOS\RestBundle\View\View
      */
-    public function Delete(string $id)
+    public function deleteAction(string $id)
     {
         $auteur=$this->findAuteurById ($id);
 
