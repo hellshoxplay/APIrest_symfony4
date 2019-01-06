@@ -19,14 +19,11 @@ class Client extends Personne
     private $id;
 
     /**
-     * @ORM\Column(type="date")
+     * @ORM\Column(type="date", nullable=true)
      */
     private $dateDeNaissance;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Livre", mappedBy="clients")
-     */
-    private $livres;
+
 
     public function __construct()
     {

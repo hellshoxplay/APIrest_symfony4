@@ -18,10 +18,6 @@ class Auteur extends Personne
      */
     private $id;
 
-    /**
-     * @ORM\OneToMany(targetEntity="App\Entity\Livre", mappedBy="auteur")
-     */
-    private $livres;
 
     public function __construct()
     {
