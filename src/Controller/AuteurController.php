@@ -129,6 +129,27 @@ class AuteurController extends FOSRestController implements ClassResourceInterfa
     }
 
     /**
+     * @param Request $request
+     * @param string $id
+     * @return \FOS\RestBundle\View\View
+     */
+    public function patchAction(Request $request, string $id)
+    {
+        $existingAuteur=$this->findAuteurById ($id);
+
+        $form=$this->createForm (AuteurType::class, $existingAuteur);
+        $form->submit ($request->request->all ());
+
+        if(false===$form->isValid ()){
+            return $this->view ($form);
+        }
+
+        $this->entityManager->flush ();
+
+        return $this->view (null, Response::HTTP_NO_CONTENT);
+    }
+  
+   /**
      * @param string $id
      * @return \FOS\RestBundle\View\View
      */
@@ -140,6 +161,7 @@ class AuteurController extends FOSRestController implements ClassResourceInterfa
         $this->entityManager->flush ();
 
         return $this->view (null,Response::HTTP_NO_CONTENT);
+
     }
 
 }

@@ -126,6 +126,27 @@ class ClientController extends FOSRestController implements ClassResourceInterfa
     }
 
     /**
+     * @param Request $request
+     * @param string $id
+     * @return \FOS\RestBundle\View\View
+     */
+    public function patchAction(Request $request, string $id)
+    {
+        $existingclient=$this->clientRepository->find($id);
+
+        $form=$this->createForm (ClientType::class, $existingclient);
+        $form->submit ($request->request->all(), false);
+
+        if(false===$form->isValid ()){
+            return $this->view ($form);
+        }
+
+        $this->entityManager->flush ();
+
+        return $this->view (null, Response::HTTP_NO_CONTENT);
+    }
+  
+   /**
      * @param string $id
      * @return \FOS\RestBundle\View\View
      */
