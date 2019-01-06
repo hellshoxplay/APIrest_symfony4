@@ -128,4 +128,18 @@ class AuteurController extends FOSRestController implements ClassResourceInterfa
         return $this->view (null, Response::HTTP_NO_CONTENT);
     }
 
+    /**
+     * @param string $id
+     * @return \FOS\RestBundle\View\View
+     */
+    public function Delete(string $id)
+    {
+        $auteur=$this->findAuteurById ($id);
+
+        $this->entityManager->remove ($auteur);
+        $this->entityManager->flush ();
+
+        return $this->view (null,Response::HTTP_NO_CONTENT);
+    }
+
 }

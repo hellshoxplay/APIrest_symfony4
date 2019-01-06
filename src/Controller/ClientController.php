@@ -125,4 +125,18 @@ class ClientController extends FOSRestController implements ClassResourceInterfa
         return $this->view (null, Response::HTTP_NO_CONTENT);
     }
 
+    /**
+     * @param string $id
+     * @return \FOS\RestBundle\View\View
+     */
+    public function Delete(string $id)
+    {
+        $client=$this->findClientById($id);
+
+        $this->entityManager->remove ($client);
+        $this->entityManager->flush ();
+
+        return $this->view (null,Response::HTTP_NO_CONTENT);
+    }
+
 }
