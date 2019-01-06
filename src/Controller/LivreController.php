@@ -11,6 +11,7 @@ use FOS\RestBundle\Routing\ClassResourceInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class LivreController
@@ -41,6 +42,22 @@ class LivreController extends FOSRestController implements ClassResourceInterfac
         $this->entityManager = $entityManager;
         $this->livreRepository=$livreRepository;
     }
+
+    /**
+     * @param $id
+     * @return Livre|null
+     */
+    private function findLivreById(string $id)
+    {
+         $livre = $this->livreRepository->find ($id);
+
+         if(null===$livre){
+             throw new NotFoundHttpException();
+         }
+
+         return $livre;
+    }
+
 
 
     /**
@@ -73,10 +90,10 @@ class LivreController extends FOSRestController implements ClassResourceInterfac
      * @param $id
      * @return \FOS\RestBundle\View\View
      */
-    public function getAction($id)
+    public function getAction(string $id)
     {
         return $this->view (
-            $this->livreRepository->find ($id)
+            $this->findLivreById ($id)
         );
     }
 
@@ -95,9 +112,9 @@ class LivreController extends FOSRestController implements ClassResourceInterfac
      * @param $id
      * @return \FOS\RestBundle\View\View
      */
-    public function putAction(Request $request, $id)
+    public function putAction(Request $request, string $id)
     {
-        $existingLivre=$this->livreRepository->find($id);
+        $existingLivre=$this->findLivreById ($id);
 
         $form=$this->createForm (LivreType::class, $existingLivre);
         $form->submit ($request->request->all ());
@@ -110,6 +127,7 @@ class LivreController extends FOSRestController implements ClassResourceInterfac
 
         return $this->view (null, Response::HTTP_NO_CONTENT);
     }
+
 
 
 }
