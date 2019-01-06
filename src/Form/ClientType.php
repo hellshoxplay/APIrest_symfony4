@@ -22,6 +22,8 @@ class ClientType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Client::class,
+            'allow_extra_field'=>true,
+            'csrf_protection' => false,
         ]);
     }
 }

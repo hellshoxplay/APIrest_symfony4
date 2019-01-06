@@ -21,6 +21,8 @@ class LivreType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => Livre::class,
+            'allow_extra_fields'=>true,
+            'csrf_protection' => false,
         ]);
     }
 }
