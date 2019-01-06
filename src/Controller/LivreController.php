@@ -128,7 +128,26 @@ class LivreController extends FOSRestController implements ClassResourceInterfac
         return $this->view (null, Response::HTTP_NO_CONTENT);
     }
 
+    /**
+     * @param Request $request
+     * @param string $id
+     * @return \FOS\RestBundle\View\View
+     */
+    public function patchAction(Request $request, string $id)
+    {
+        $existingLivre=$this->findLivreById ($id);
 
+        $form=$this->createForm (LivreType::class, $existingLivre);
+        $form->submit ($request->request->all(), false);
+
+        if(false===$form->isValid ()){
+            return $this->view ($form);
+        }
+
+        $this->entityManager->flush ();
+
+        return $this->view (null, Response::HTTP_NO_CONTENT);
+    }
 
 }
 
