@@ -61,6 +61,34 @@ class LivreController extends AbstractFOSRestController implements ClassResource
          return $livre;
     }
 
+    /**
+     * @param Request $request
+     * @param $clearmissing
+     * @return \FOS\RestBundle\View\View
+     */
+    private function updateLivre(Request $request,$clearmissing)
+    {
+        $livre=$this->getDoctrine ()->getManager ()
+            ->getRepository (Livre::class)
+            ->find ($request->get ('id'));
+        if(empty($livre)){
+            return $this->view (null,Response::HTTP_NOT_FOUND);
+        }
+
+        $form=$this->createForm (LivreType::class, $livre);
+        $form->submit ($request->request->all (),$clearmissing);
+
+        if ($form->isValid ()) {
+            $em = $this->getDoctrine ()->getManager ();
+            $em->persist($livre);
+            $em->flush ();
+
+            return $this->view ( $livre , Response::HTTP_OK);
+        }else{
+            return $this->view ($form, Response::HTTP_NOT_MODIFIED);
+        }
+    }
+
      /**
      * @param $id
      * @return \FOS\RestBundle\View\View
@@ -128,6 +156,27 @@ class LivreController extends AbstractFOSRestController implements ClassResource
 
     /**
      * @param Request $request
+     * @return \FOS\RestBundle\View\View
+     * @Rest\Put("/livre/{id}")
+     */
+    public function putAction(Request $request)
+    {
+        return $this->updateLivre ($request,true);
+    }
+
+    /**
+     * @param Request $request
+     * @return \FOS\RestBundle\View\View
+     * @Rest\Patch("/livre/{id}")
+     */
+    public function patchAction(Request $request )
+    {
+        return $this->updateLivre ($request,false);
+
+    }
+
+    /**
+     * @param Request $request
      * @return int|null|object
      * @Rest\View()
      * @Rest\Get("/livre/{id}/auteur")
@@ -142,60 +191,6 @@ class LivreController extends AbstractFOSRestController implements ClassResource
             return Response::HTTP_NOT_FOUND;
         }
         return $auteur;
-    }
-
-    /**
-     * @param Request $request
-     * @param $id
-     * @return \FOS\RestBundle\View\View
-     */
-    public function putAction(Request $request, string $id)
-    {
-        $existingLivre=$this->findLivreById ($id);
-
-        $form=$this->createForm (LivreType::class, $existingLivre);
-        $form->submit ($request->request->all ());
-
-        if ($form->isValid ()) {
-            $em = $this->getDoctrine ()->getManager ();
-            $em->merge ( $existingLivre );
-            $em->flush ();
-            return $this->view ( null , Response::HTTP_NO_CONTENT );
-        }else{
-            return $this->view ($form);
-        }
-    }
-
-    /**
-     * @param Request $request
-     * @return \FOS\RestBundle\View\View|null|object|\Symfony\Component\Form\FormInterface
-     * @Rest\View()
-     * @Rest\Patch()
-     */
-    public function patchAction(Request $request )
-    {
-        $livre= $this->getDoctrine ()->getManager ()
-            ->getRepository (Livre::class)
-            ->find ($request->get ('id'));
-
-        if(empty($livre)){
-
-            return $this->view (null, Response::HTTP_NOT_FOUND);
-        }
-
-        $form=$this->createForm (LivreType::class, $livre);
-        $form->submit ($request->request->all(), false);
-
-        if($form->isValid ()){
-            $em=$this->getDoctrine ()->getManager ();
-            $em->merge ($livre);
-            $em->flush();
-
-            return $livre;
-        }else{
-            return $form;
-        }
-
     }
 
     /**

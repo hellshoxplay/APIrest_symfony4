@@ -56,6 +56,34 @@ class ClientController extends AbstractFOSRestController implements ClassResourc
 
         return $client;
     }
+
+    /**
+     * @param Request $request
+     * @param $clearmissing
+     * @return \FOS\RestBundle\View\View
+     */
+    public function updateClient(Request $request,$clearmissing)
+    {
+        $client=$this->getDoctrine ()->getManager ()
+            ->getRepository (Client::class)
+            ->find ($request->get ('id'));
+        if(empty($client)){
+            return $this->view (null,Response::HTTP_NOT_FOUND);
+        }
+
+        $form=$this->createForm (ClientType::class, $client);
+        $form->submit ($request->request->all (),$clearmissing);
+
+        if ($form->isValid ()) {
+            $em = $this->getDoctrine ()->getManager ();
+            $em->merge ($client);
+            $em->flush ();
+            return $this->view ( $client , Response::HTTP_OK);
+        }else{
+            return $this->view ($form, Response::HTTP_NOT_MODIFIED);
+        }
+    }
+
     /**
      * @param $id
      * @return \FOS\RestBundle\View\View
@@ -120,27 +148,15 @@ class ClientController extends AbstractFOSRestController implements ClassResourc
             $em->flush ();
         }
     }
-
-
     /**
      * @param Request $request
-     * @param $id
      * @return \FOS\RestBundle\View\View
+     * @Rest\View()
+     * @Rest\Put("/client/{id}"))
      */
-    public function putAction(Request $request, $id)
+    public function putAction(Request $request)
     {
-        $existingclient=$this->clientRepository->find($id);
-
-        $form=$this->createForm (ClientType::class, $existingclient);
-        $form->submit ($request->request->all ());
-
-        if(false===$form->isValid ()){
-            return $this->view ($form);
-        }
-
-        $this->entityManager->flush ();
-
-        return $this->view (null, Response::HTTP_NO_CONTENT);
+     return $this->updateClient ($request,true);
     }
 
     /**
@@ -148,20 +164,9 @@ class ClientController extends AbstractFOSRestController implements ClassResourc
      * @param string $id
      * @return \FOS\RestBundle\View\View
      */
-    public function patchAction(Request $request, string $id)
+    public function patchAction(Request $request)
     {
-        $existingclient=$this->clientRepository->find($id);
-
-        $form=$this->createForm (ClientType::class, $existingclient);
-        $form->submit ($request->request->all(), false);
-
-        if(false===$form->isValid ()){
-            return $this->view ($form);
-        }
-
-        $this->entityManager->flush ();
-
-        return $this->view (null, Response::HTTP_NO_CONTENT);
+        return $this->updateClient ($request,false);
     }
 
 }

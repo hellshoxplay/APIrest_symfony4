@@ -61,6 +61,33 @@ class AuteurController extends AbstractFOSRestController implements ClassResourc
     }
 
     /**
+     * @param Request $request
+     * @param $clearmissing
+     * @return \FOS\RestBundle\View\View
+     */
+    private function updateAuteur(Request $request,$clearmissing)
+    {
+        $auteur=$this->getDoctrine ()->getManager ()
+            ->getRepository (Auteur::class)
+            ->find ($request->get ('id'));
+        if(empty($auteur)){
+            return $this->view (null,Response::HTTP_NOT_FOUND);
+        }
+
+        $form=$this->createForm (AuteurType::class, $auteur);
+        $form->submit ($request->request->all (),$clearmissing);
+
+        if ($form->isValid ()) {
+            $em = $this->getDoctrine ()->getManager ();
+            $em->persist ($auteur);
+            $em->flush ();
+            return $this->view ( $auteur , Response::HTTP_OK);
+        }else{
+            return $this->view ($form, Response::HTTP_NOT_MODIFIED);
+        }
+    }
+
+    /**
      * @param $id
      * @return \FOS\RestBundle\View\View
      * @Rest\View()
@@ -128,23 +155,13 @@ class AuteurController extends AbstractFOSRestController implements ClassResourc
 
     /**
      * @param Request $request
-     * @param $id
      * @return \FOS\RestBundle\View\View
+     * @Rest\View()
+     * @Rest\Put("/auteur/{id}"))
      */
-    public function putAction(Request $request, $id)
+    public function putAction(Request $request)
     {
-        $existingAuteur=$this->findAuteurById ($id);
-
-        $form=$this->createForm (AuteurType::class, $existingAuteur);
-        $form->submit ($request->request->all ());
-
-        if(false===$form->isValid ()){
-            return $this->view ($form);
-        }
-
-        $this->entityManager->flush ();
-
-        return $this->view (null, Response::HTTP_NO_CONTENT);
+        return $this->updateAuteur ($request, true);
     }
 
     /**
@@ -154,18 +171,7 @@ class AuteurController extends AbstractFOSRestController implements ClassResourc
      */
     public function patchAction(Request $request, string $id)
     {
-        $existingAuteur=$this->findAuteurById ($id);
-
-        $form=$this->createForm (AuteurType::class, $existingAuteur);
-        $form->submit ($request->request->all ());
-
-        if(false===$form->isValid ()){
-            return $this->view ($form);
-        }
-
-        $this->entityManager->flush ();
-
-        return $this->view (null, Response::HTTP_NO_CONTENT);
+        return $this->updateAuteur ($request,false);
     }
 
 }
