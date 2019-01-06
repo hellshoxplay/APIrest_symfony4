@@ -56,36 +56,11 @@ class ClientController extends AbstractFOSRestController implements ClassResourc
 
         return $client;
     }
-
-    /**
-     * @param Request $request
-     * @return \FOS\RestBundle\View\View|Response
-     */
-    public function postAction(Request $request)
-    {
-        $form=$this->createForm (ClientType::class, new Client());
-
-        $form->submit ($request->request->all());
-
-        if (false===$form->isValid()) {
-            return $this->handleView (
-                $this->view($form)
-            );
-        }
-
-        $this->entityManager->persist ($form->getData ());
-        $this->entityManager->flush ();
-
-        return $this->view (
-            [
-                'status' =>'ok',
-            ]
-        );
-    }
-
     /**
      * @param $id
      * @return \FOS\RestBundle\View\View
+     * @Rest\View()
+     * @Rest\Get("client/{id}")
      */
     public function getAction($id)
     {
@@ -96,13 +71,40 @@ class ClientController extends AbstractFOSRestController implements ClassResourc
 
     /**
      * @return \FOS\RestBundle\View\View
+     * @Rest\View()
+     * @Rest\Get("clients")
      */
+
     public function cgetAction()
     {
         return $this->view (
             $this->clientRepository->findAll ()
         );
     }
+    /**
+     * @param Request $request
+     * @return \FOS\RestBundle\View\View|Response
+     * @Rest\View(statusCode=Response::HTTP_CREATED)
+     * @Rest\Post("/client")
+     */
+    public function postAction(Request $request)
+    {
+        $client=new Client();
+        $form=$this->createForm (ClientType::class, $client);
+        $form->submit ($request->request->all());
+
+        if ($form->isValid()) {
+            $em = $this->getDoctrine ()->getManager ();
+            $em->getRepository ( Client::class );
+            $em->persist ($client);
+            $em->flush ();
+
+            return $this->view ( $client , Response::HTTP_CREATED );
+        }else {
+            return $this->view ( $form );
+        }
+    }
+
 
     /**
      * @param Request $request

@@ -61,34 +61,10 @@ class AuteurController extends AbstractFOSRestController implements ClassResourc
     }
 
     /**
-     * @param Request $request
-     * @return \FOS\RestBundle\View\View|Response
-     */
-    public function postAction(Request $request)
-    {
-        $form=$this->createForm (AuteurType::class, new Auteur());
-
-        $form->submit ($request->request->all());
-
-        if (false===$form->isValid()) {
-            return $this->handleView (
-                $this->view($form)
-            );
-        }
-
-        $this->entityManager->persist ($form->getData ());
-        $this->entityManager->flush ();
-
-        return $this->view (
-            [
-                'status' =>'ok',
-            ]
-        );
-    }
-
-    /**
      * @param $id
      * @return \FOS\RestBundle\View\View
+     * @Rest\View()
+     * @Rest\Get("/auteur/{id}")
      */
     public function getAction($id)
     {
@@ -99,12 +75,39 @@ class AuteurController extends AbstractFOSRestController implements ClassResourc
 
     /**
      * @return \FOS\RestBundle\View\View
+     * @Rest\View()
+     * @Rest\Get("/auteurs")
+     *
      */
     public function cgetAction()
     {
         return $this->view (
             $this->auteurRepository->findAll ()
         );
+    }
+
+    /**
+     * @param Request $request
+     * @return \FOS\RestBundle\View\View|Response
+     * @Rest\View(statusCode=Response::HTTP_CREATED)
+     * @Rest\Post("/auteur")
+     */
+    public function postAction(Request $request)
+    {
+        $auteur=new Auteur();
+        $form=$this->createForm (AuteurType::class, $auteur);
+        $form->submit ($request->request->all());
+
+        if ($form->isValid()) {
+            $em = $this->getDoctrine ()->getManager ();
+            $em->getRepository ( Auteur::class );
+            $em->persist ($auteur);
+            $em->flush ();
+
+            return $this->view ( $auteur , Response::HTTP_CREATED );
+        }else {
+            return $this->view ( $form );
+        }
     }
 
     /**

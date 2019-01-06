@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Livre;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
@@ -13,7 +14,10 @@ class LivreType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder
-            ->add('titre', TextType::class)
+            ->add('titre', TextType::class, array(
+                'empty_data'=>'',
+            ))
+            ->add ('auteur', AuteurType::class)
         ;
     }
 

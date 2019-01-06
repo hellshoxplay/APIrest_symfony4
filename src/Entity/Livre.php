@@ -24,6 +24,11 @@ class Livre
      */
     private $titre;
 
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Auteur", inversedBy="livres", cascade={"all"})
+     */
+    private $auteur;
+
 
 
     public function __construct()
@@ -44,6 +49,18 @@ class Livre
     public function setTitre(string $titre): self
     {
         $this->titre = $titre;
+
+        return $this;
+    }
+
+    public function getAuteur(): ?Auteur
+    {
+        return $this->auteur;
+    }
+
+    public function setAuteur(?Auteur $auteur): self
+    {
+        $this->auteur = $auteur;
 
         return $this;
     }
