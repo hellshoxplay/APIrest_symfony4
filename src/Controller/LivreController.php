@@ -61,7 +61,30 @@ class LivreController extends AbstractFOSRestController implements ClassResource
          return $livre;
     }
 
+     /**
+     * @param $id
+     * @return \FOS\RestBundle\View\View
+     * @Rest\View()
+      * @Rest\Get("/livre/{id}")
+     */
+    public function getAction(string $id)
+    {
+        return $this->view (
+            $this->findLivreById ($id)
+        );
+    }
 
+    /**
+     * @return \FOS\RestBundle\View\View
+     * @Rest\View()
+     * @Rest\Get("/livres")
+     */
+    public function cgetAction()
+    {
+        return $this->view (
+            $this->livreRepository->findAll ()
+        );
+    }
 
     /**
      * @param Request $request
@@ -87,31 +110,21 @@ class LivreController extends AbstractFOSRestController implements ClassResource
         }
     }
 
-     /**
-     * @param $id
-     * @return \FOS\RestBundle\View\View
-     * @Rest\View()
-      * @Rest\Get("/livre/{id}")
-     */
-    public function getAction(string $id)
-    {
-        return $this->view (
-            $this->findLivreById ($id)
-        );
-    }
-
     /**
-     * @return \FOS\RestBundle\View\View
-     * @Rest\View()
-     * @Rest\Get("/livres")
+     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT)
+     * @Rest\Delete("livre/{id}")
      */
-    public function cgetAction()
+    public function deleteAction(Request $request)
     {
-        return $this->view (
-            $this->livreRepository->findAll ()
-    );
-    }
+        $em=$this->getDoctrine ()->getManager ();
+        $livre=$em->getRepository (Livre::class)
+                ->find ($request->get('id'));
 
+        if(!empty($livre)) {
+            $em->remove ($livre);
+            $em->flush ();
+        }
+    }
 
     /**
      * @param Request $request
@@ -220,19 +233,7 @@ class LivreController extends AbstractFOSRestController implements ClassResource
         }
     }
   
-   /**
-     * @param string $id
-     * @return \FOS\RestBundle\View\View
-     */
-    public function deleteAction(string $id)
-    {
-        $livre=$this->findLivreById ($id);
 
-        $this->entityManager->remove ($livre);
-        $this->entityManager->flush ();
-
-        return $this->view (null,Response::HTTP_NO_CONTENT);
-    }
 
 }
 

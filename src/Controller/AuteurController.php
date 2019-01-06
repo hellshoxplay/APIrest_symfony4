@@ -111,6 +111,22 @@ class AuteurController extends AbstractFOSRestController implements ClassResourc
     }
 
     /**
+     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT)
+     * @Rest\Delete("auteur/{id}")
+     */
+    public function deleteAction(Request $request)
+    {
+        $em=$this->getDoctrine ()->getManager ();
+        $auteur=$em->getRepository (Auteur::class)
+            ->find ($request->get('id'));
+
+        if(!empty($auteur)) {
+            $em->remove ($auteur);
+            $em->flush ();
+        }
+    }
+
+    /**
      * @param Request $request
      * @param $id
      * @return \FOS\RestBundle\View\View
@@ -150,21 +166,6 @@ class AuteurController extends AbstractFOSRestController implements ClassResourc
         $this->entityManager->flush ();
 
         return $this->view (null, Response::HTTP_NO_CONTENT);
-    }
-  
-   /**
-     * @param string $id
-     * @return \FOS\RestBundle\View\View
-     */
-    public function deleteAction(string $id)
-    {
-        $auteur=$this->findAuteurById ($id);
-
-        $this->entityManager->remove ($auteur);
-        $this->entityManager->flush ();
-
-        return $this->view (null,Response::HTTP_NO_CONTENT);
-
     }
 
 }

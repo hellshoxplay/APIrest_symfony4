@@ -105,6 +105,22 @@ class ClientController extends AbstractFOSRestController implements ClassResourc
         }
     }
 
+    /**
+     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT)
+     * @Rest\Delete("client/{id}")
+     */
+    public function deleteAction(Request $request)
+    {
+        $em=$this->getDoctrine ()->getManager ();
+        $client=$em->getRepository (Client::class)
+            ->find ($request->get('id'));
+
+        if(!empty($client)) {
+            $em->remove ($client);
+            $em->flush ();
+        }
+    }
+
 
     /**
      * @param Request $request
@@ -146,20 +162,6 @@ class ClientController extends AbstractFOSRestController implements ClassResourc
         $this->entityManager->flush ();
 
         return $this->view (null, Response::HTTP_NO_CONTENT);
-    }
-  
-   /**
-     * @param string $id
-     * @return \FOS\RestBundle\View\View
-     */
-    public function deleteAction(string $id)
-    {
-        $client=$this->findClientById($id);
-
-        $this->entityManager->remove ($client);
-        $this->entityManager->flush ();
-
-        return $this->view (null,Response::HTTP_NO_CONTENT);
     }
 
 }
