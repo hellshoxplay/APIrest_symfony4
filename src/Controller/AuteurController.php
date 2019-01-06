@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class AuteurController
@@ -44,6 +45,20 @@ class AuteurController extends FOSRestController implements ClassResourceInterfa
         $this->auteurRepository=$auteurRepository;
     }
 
+    /**
+     * @param $id
+     * @return Auteur|null
+     */
+    private function findAuteurById($id)
+    {
+        $auteur = $this->auteurRepository->find ($id);
+
+        if(null===$auteur){
+            throw new NotFoundHttpException();
+        }
+
+        return $auteur;
+    }
 
     /**
      * @param Request $request
@@ -78,7 +93,7 @@ class AuteurController extends FOSRestController implements ClassResourceInterfa
     public function getAction($id)
     {
         return $this->view (
-            $this->auteurRepository->find ($id)
+            $this->findAuteurById ($id)
         );
     }
 
@@ -92,7 +107,6 @@ class AuteurController extends FOSRestController implements ClassResourceInterfa
         );
     }
 
-
     /**
      * @param Request $request
      * @param $id
@@ -100,7 +114,7 @@ class AuteurController extends FOSRestController implements ClassResourceInterfa
      */
     public function putAction(Request $request, $id)
     {
-        $existingAuteur=$this->auteurRepository->find($id);
+        $existingAuteur=$this->findAuteurById ($id);
 
         $form=$this->createForm (AuteurType::class, $existingAuteur);
         $form->submit ($request->request->all ());

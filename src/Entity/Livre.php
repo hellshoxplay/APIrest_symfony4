@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints;
 
@@ -22,6 +24,13 @@ class Livre
      */
     private $titre;
 
+
+
+    public function __construct()
+    {
+        $this->clients = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -38,4 +47,5 @@ class Livre
 
         return $this;
     }
+
 }

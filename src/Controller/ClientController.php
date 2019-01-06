@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class ClientController
@@ -41,7 +42,20 @@ class ClientController extends FOSRestController implements ClassResourceInterfa
         $this->entityManager = $entityManager;
         $this->clientRepository=$clientRepository;
     }
+    /**
+     * @param $id
+     * @return Client|null
+     */
+    private function findClientById($id)
+    {
+        $client = $this->clientRepository->find($id);
 
+        if(null===$client){
+            throw new NotFoundHttpException();
+        }
+
+        return $client;
+    }
 
     /**
      * @param Request $request
