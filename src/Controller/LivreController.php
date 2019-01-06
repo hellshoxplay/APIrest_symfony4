@@ -148,6 +148,20 @@ class LivreController extends FOSRestController implements ClassResourceInterfac
 
         return $this->view (null, Response::HTTP_NO_CONTENT);
     }
+  
+   /**
+     * @param string $id
+     * @return \FOS\RestBundle\View\View
+     */
+    public function Delete(string $id)
+    {
+        $livre=$this->findLivreById ($id);
+
+        $this->entityManager->remove ($livre);
+        $this->entityManager->flush ();
+
+        return $this->view (null,Response::HTTP_NO_CONTENT);
+    }
 
 }
 
