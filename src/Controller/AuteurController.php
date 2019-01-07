@@ -4,14 +4,11 @@ namespace App\Controller;
 
 use App\Entity\Auteur;
 use App\Form\AuteurType;
-use App\Repository\AuteurRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class AuteurController
@@ -55,7 +52,7 @@ class AuteurController extends AbstractFOSRestController implements ClassResourc
     /**
      * @param Request $request
      * @return \FOS\RestBundle\View\View
-     * @Rest\View()
+     * @Rest\View(serializerGroups={"auteur"})
      * @Rest\Get("/auteur/{id}")
      */
     public function getAction(Request $request)
@@ -69,7 +66,7 @@ class AuteurController extends AbstractFOSRestController implements ClassResourc
 
     /**
      * @return \FOS\RestBundle\View\View
-     * @Rest\View()
+     * @Rest\View(serializerGroups={"auteur"})
      * @Rest\Get("/auteurs")
      *
      */
@@ -85,7 +82,7 @@ class AuteurController extends AbstractFOSRestController implements ClassResourc
     /**
      * @param Request $request
      * @return \FOS\RestBundle\View\View|Response
-     * @Rest\View(statusCode=Response::HTTP_CREATED)
+     * @Rest\View(statusCode=Response::HTTP_CREATED,serializerGroups={"auteur"})
      * @Rest\Post("/auteur")
      */
     public function postAction(Request $request)
@@ -108,7 +105,7 @@ class AuteurController extends AbstractFOSRestController implements ClassResourc
 
     /**
      * @param Request $request
-     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT)
+     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT,serializerGroups={"auteur"})
      * @Rest\Delete("auteur/{id}")
      */
     public function deleteAction(Request $request)
@@ -126,7 +123,7 @@ class AuteurController extends AbstractFOSRestController implements ClassResourc
     /**
      * @param Request $request
      * @return \FOS\RestBundle\View\View
-     * @Rest\View()
+     * @Rest\View(serializerGroups={"auteur"})
      * @Rest\Put("/auteur/{id}"))
      */
     public function putAction(Request $request)
@@ -136,10 +133,9 @@ class AuteurController extends AbstractFOSRestController implements ClassResourc
 
     /**
      * @param Request $request
-     * @param string $id
      * @return \FOS\RestBundle\View\View
      */
-    public function patchAction(Request $request, string $id)
+    public function patchAction(Request $request)
     {
         return $this->updateAuteur ($request,false);
     }
