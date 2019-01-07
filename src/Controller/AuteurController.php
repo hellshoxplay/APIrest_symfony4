@@ -107,6 +107,7 @@ class AuteurController extends AbstractFOSRestController implements ClassResourc
     }
 
     /**
+     * @param Request $request
      * @Rest\View(statusCode=Response::HTTP_NO_CONTENT)
      * @Rest\Delete("auteur/{id}")
      */

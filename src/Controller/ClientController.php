@@ -52,7 +52,7 @@ class ClientController extends AbstractFOSRestController implements ClassResourc
     }
 
     /**
-     * @param $id
+     * @param Request $request
      * @return \FOS\RestBundle\View\View
      * @Rest\View()
      * @Rest\Get("client/{id}")
@@ -103,6 +103,7 @@ class ClientController extends AbstractFOSRestController implements ClassResourc
     }
 
     /**
+     * @param Request $request
      * @Rest\View(statusCode=Response::HTTP_NO_CONTENT)
      * @Rest\Delete("client/{id}")
      */
@@ -130,7 +131,6 @@ class ClientController extends AbstractFOSRestController implements ClassResourc
 
     /**
      * @param Request $request
-     * @param string $id
      * @return \FOS\RestBundle\View\View
      */
     public function patchAction(Request $request)
