@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Auteur;
 use App\Entity\Livre;
-use App\Form\AuteurType;
 use App\Form\LivreType;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
@@ -54,7 +53,7 @@ class LivreController extends AbstractFOSRestController implements ClassResource
      /**
      * @param Request $request
      * @return \FOS\RestBundle\View\View
-     * @Rest\View()
+     * @Rest\View(serializerGroups={"livre"})
       * @Rest\Get("/livre/{id}")
      */
     public function getAction(Request $request)
@@ -68,7 +67,7 @@ class LivreController extends AbstractFOSRestController implements ClassResource
 
     /**
      * @return \FOS\RestBundle\View\View
-     * @Rest\View()
+     * @Rest\View(serializerGroups={"livre"})
      * @Rest\Get("/livres")
      */
     public function cgetAction()
@@ -82,7 +81,7 @@ class LivreController extends AbstractFOSRestController implements ClassResource
     /**
      * @param Request $request
      * @return \FOS\RestBundle\View\View|Response
-     * @Rest\View(statusCode=Response::HTTP_CREATED)
+     * @Rest\View(statusCode=Response::HTTP_CREATED,serializerGroups={"livre"})
      * @Rest\Post("/livre")
      */
     public function postAction(Request $request)
@@ -105,7 +104,7 @@ class LivreController extends AbstractFOSRestController implements ClassResource
 
     /**
      * @param Request $request
-     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT)
+     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT, serializerGroups={"livre"})
      * @Rest\Delete("livre/{id}")
      */
     public function deleteAction(Request $request)
@@ -140,6 +139,60 @@ class LivreController extends AbstractFOSRestController implements ClassResource
         return $this->updateLivre ($request,false);
 
     }
+// on passe aux routes de type "sub ressources"
 
+    /**
+     * @param Request $request
+     * @return \FOS\RestBundle\View\View
+     * @Rest\View(serializerGroups={"livre","auteur"})
+     * @Rest\get("auteur/{id}/livres")
+     */
+    public function getLivresAuteurAction(Request $request)
+    {
+        $auteur=$this->getDoctrine ()->getManager ()
+            ->getRepository (Auteur::class)
+            ->find ($request->get ('id'));
+
+        if(empty($auteur)){
+            return $this->view (null, Response::HTTP_NOT_FOUND);
+        }
+
+        return $this->view ($auteur,Response::HTTP_OK);
+    }
+
+    /**
+     * @param Request $request
+     * @return \FOS\RestBundle\View\View
+     * @Rest\View(statusCode=Response::HTTP_CREATED,serializerGroups={"livre", "auteur"})
+     * @Rest\Post("/auteur/{id}/livres")
+     */
+    public function postLivresAuteurAction(Request $request)
+    {
+        $auteur=$this->getDoctrine ()->getManager ()
+            ->getRepository (Auteur::class)
+            ->find ($request->get ('id'));
+
+        if(empty($auteur)){
+            return $this->view (null, Response::HTTP_BAD_REQUEST);
+        }
+
+        $livres=new Livre();
+        $livres->setAuteur ($auteur);
+        $form=$this->createForm (LivreType::class, $livres);
+        $form->submit ($request->request->all ());
+
+        if($form->isValid ()){
+
+            $em=$this->getDoctrine ()->getManager ();
+            $em->persist ($livres);
+            $em->flush ();
+
+            return $this->view ($auteur,Response::HTTP_CREATED);
+
+        }else {
+
+            return $this->view ( $form , Response::HTTP_NOT_FOUND );
+        }
+    }
 }
 
