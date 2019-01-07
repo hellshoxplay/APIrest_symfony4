@@ -134,6 +134,7 @@ class AuteurController extends AbstractFOSRestController implements ClassResourc
     /**
      * @param Request $request
      * @return \FOS\RestBundle\View\View
+     * @Rest\View(serializerGroups={"auteur"})
      */
     public function patchAction(Request $request)
     {

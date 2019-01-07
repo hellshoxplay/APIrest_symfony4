@@ -33,6 +33,11 @@ class Livre
      */
     private $auteur;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Client", inversedBy="livres")
+     */
+    private $clients;
+
 
 
     public function __construct()
@@ -65,6 +70,32 @@ class Livre
     public function setAuteur(?Auteur $auteur): self
     {
         $this->auteur = $auteur;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Client[]
+     */
+    public function getClients(): Collection
+    {
+        return $this->clients;
+    }
+
+    public function addClient(Client $client): self
+    {
+        if (!$this->clients->contains($client)) {
+            $this->clients[] = $client;
+        }
+
+        return $this;
+    }
+
+    public function removeClient(Client $client): self
+    {
+        if ($this->clients->contains($client)) {
+            $this->clients->removeElement($client);
+        }
 
         return $this;
     }
