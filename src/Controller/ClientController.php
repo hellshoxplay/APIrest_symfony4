@@ -51,7 +51,7 @@ class ClientController extends AbstractFOSRestController implements ClassResourc
     /**
      * @param Request $request
      * @return \FOS\RestBundle\View\View
-     * @Rest\View()
+     * @Rest\View(serializerGroups={"client"})
      * @Rest\Get("client/{id}")
      */
     public function getAction(Request $request)
@@ -59,13 +59,17 @@ class ClientController extends AbstractFOSRestController implements ClassResourc
         $client=$this->getDoctrine ()->getManager ()
             ->getRepository (Client::class)
             ->find ($request->get ('id'));
-        return $this->view ($client, Response::HTTP_OK);
+        if(empty($client)){
+            return $this->view (null,Response::HTTP_NOT_FOUND);
+        }else {
+            return $this->view ( $client , Response::HTTP_OK );
+        }
     }
 
     /**
      * @return \FOS\RestBundle\View\View
-     * @Rest\View()
-     * @Rest\Get("clients")
+     * @Rest\View(serializerGroups={"client"})
+     * @Rest\Get("/clients")
      */
 
     public function cgetAction()
@@ -78,7 +82,7 @@ class ClientController extends AbstractFOSRestController implements ClassResourc
     /**
      * @param Request $request
      * @return \FOS\RestBundle\View\View|Response
-     * @Rest\View(statusCode=Response::HTTP_CREATED)
+     * @Rest\View(statusCode=Response::HTTP_CREATED,serializerGroups={"client"})
      * @Rest\Post("/client")
      */
     public function postAction(Request $request)
@@ -101,7 +105,7 @@ class ClientController extends AbstractFOSRestController implements ClassResourc
 
     /**
      * @param Request $request
-     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT)
+     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT,serializerGroups={"client"})
      * @Rest\Delete("client/{id}")
      */
     public function deleteAction(Request $request)
@@ -118,7 +122,7 @@ class ClientController extends AbstractFOSRestController implements ClassResourc
     /**
      * @param Request $request
      * @return \FOS\RestBundle\View\View
-     * @Rest\View()
+     * @Rest\View(serializerGroups={"client"})
      * @Rest\Put("/client/{id}"))
      */
     public function putAction(Request $request)
@@ -129,6 +133,7 @@ class ClientController extends AbstractFOSRestController implements ClassResourc
     /**
      * @param Request $request
      * @return \FOS\RestBundle\View\View
+     * @Rest\View(serializerGroups={"client"})
      */
     public function patchAction(Request $request)
     {

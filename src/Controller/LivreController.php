@@ -133,6 +133,7 @@ class LivreController extends AbstractFOSRestController implements ClassResource
      * @param Request $request
      * @return \FOS\RestBundle\View\View
      * @Rest\Patch("/livre/{id}")
+     * @Rest\View(serializerGroups={"livre"})
      */
     public function patchAction(Request $request )
     {
