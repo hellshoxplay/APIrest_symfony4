@@ -23,39 +23,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class ClientController extends AbstractFOSRestController implements ClassResourceInterface
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
-    /**
-     * @var ClientRepository
-     */
-    private $clientRepository;
-
-    /**
-     * ClientController constructor.
-     * @param EntityManagerInterface $entityManager
-     */
-    public function __construct (EntityManagerInterface $entityManager, ClientRepository $clientRepository)
-    {
-        $this->entityManager = $entityManager;
-        $this->clientRepository=$clientRepository;
-    }
-    /**
-     * @param $id
-     * @return Client|null
-     */
-    private function findClientById($id)
-    {
-        $client = $this->clientRepository->find($id);
-
-        if(null===$client){
-            throw new NotFoundHttpException();
-        }
-
-        return $client;
-    }
 
     /**
      * @param Request $request
@@ -90,11 +57,12 @@ class ClientController extends AbstractFOSRestController implements ClassResourc
      * @Rest\View()
      * @Rest\Get("client/{id}")
      */
-    public function getAction($id)
+    public function getAction(Request $request)
     {
-        return $this->view (
-            $this->clientRepository->find ($id)
-        );
+        $client=$this->getDoctrine ()->getManager ()
+            ->getRepository (Client::class)
+            ->find ($request->get ('id'));
+        return $this->view ($client, Response::HTTP_OK);
     }
 
     /**
@@ -105,9 +73,10 @@ class ClientController extends AbstractFOSRestController implements ClassResourc
 
     public function cgetAction()
     {
-        return $this->view (
-            $this->clientRepository->findAll ()
-        );
+        $client=$this->getDoctrine ()->getManager ()
+            ->getRepository (Client::class)
+            ->findAll ();
+        return $this->view ($client, Response::HTTP_OK);
     }
     /**
      * @param Request $request

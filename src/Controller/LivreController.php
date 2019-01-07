@@ -6,15 +6,11 @@ use App\Entity\Auteur;
 use App\Entity\Livre;
 use App\Form\AuteurType;
 use App\Form\LivreType;
-use App\Repository\LivreRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class LivreController
@@ -26,40 +22,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class LivreController extends AbstractFOSRestController implements ClassResourceInterface
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
-    /**
-     * @var LivreRepository
-     */
-    private $livreRepository;
-
-    /**
-     * LivreController constructor.
-     * @param EntityManagerInterface $entityManager
-     */
-    public function __construct (EntityManagerInterface $entityManager, LivreRepository $livreRepository)
-    {
-        $this->entityManager = $entityManager;
-        $this->livreRepository=$livreRepository;
-    }
-
-    /**
-     * @param $id
-     * @return Livre|null
-     */
-    private function findLivreById(string $id)
-    {
-         $livre = $this->livreRepository->find ($id);
-
-         if(null===$livre){
-             throw new NotFoundHttpException();
-         }
-
-         return $livre;
-    }
 
     /**
      * @param Request $request
@@ -90,16 +52,18 @@ class LivreController extends AbstractFOSRestController implements ClassResource
     }
 
      /**
-     * @param $id
+     * @param Request $request
      * @return \FOS\RestBundle\View\View
      * @Rest\View()
       * @Rest\Get("/livre/{id}")
      */
-    public function getAction(string $id)
+    public function getAction(Request $request)
     {
-        return $this->view (
-            $this->findLivreById ($id)
-        );
+        $livre=$this->getDoctrine ()->getManager ()
+            ->getRepository (Livre::class)
+            ->find ($request->get ('id'));
+
+        return $this->view ($livre,Response::HTTP_OK);
     }
 
     /**
@@ -109,9 +73,10 @@ class LivreController extends AbstractFOSRestController implements ClassResource
      */
     public function cgetAction()
     {
-        return $this->view (
-            $this->livreRepository->findAll ()
-        );
+        $livre=$this->getDoctrine ()->getManager ()
+            ->getRepository (Livre::class )
+            ->findAll ();
+        return $this->view ($livre, Response::HTTP_OK);
     }
 
     /**
@@ -139,6 +104,7 @@ class LivreController extends AbstractFOSRestController implements ClassResource
     }
 
     /**
+     * @param Request $request
      * @Rest\View(statusCode=Response::HTTP_NO_CONTENT)
      * @Rest\Delete("livre/{id}")
      */

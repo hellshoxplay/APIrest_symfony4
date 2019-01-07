@@ -26,41 +26,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class AuteurController extends AbstractFOSRestController implements ClassResourceInterface
 {
     /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
-
-    /**
-     * @var AuteurRepository
-     */
-    private $auteurRepository;
-
-    /**
-     * AuteurController constructor.
-     * @param EntityManagerInterface $entityManager
-     */
-    public function __construct (EntityManagerInterface $entityManager, AuteurRepository $auteurRepository)
-    {
-        $this->entityManager = $entityManager;
-        $this->auteurRepository=$auteurRepository;
-    }
-
-    /**
-     * @param $id
-     * @return Auteur|null
-     */
-    private function findAuteurById($id)
-    {
-        $auteur = $this->auteurRepository->find ($id);
-
-        if(null===$auteur){
-            throw new NotFoundHttpException();
-        }
-
-        return $auteur;
-    }
-
-    /**
      * @param Request $request
      * @param $clearmissing
      * @return \FOS\RestBundle\View\View
@@ -88,16 +53,18 @@ class AuteurController extends AbstractFOSRestController implements ClassResourc
     }
 
     /**
-     * @param $id
+     * @param Request $request
      * @return \FOS\RestBundle\View\View
      * @Rest\View()
      * @Rest\Get("/auteur/{id}")
      */
-    public function getAction($id)
+    public function getAction(Request $request)
     {
-        return $this->view (
-            $this->findAuteurById ($id)
-        );
+        $auteur=$this->getDoctrine ()->getManager ()
+            ->getRepository (Auteur::class)
+            ->find ($request->get ('id'));
+
+        return $this->view ($auteur, Response::HTTP_OK);
     }
 
     /**
@@ -108,9 +75,11 @@ class AuteurController extends AbstractFOSRestController implements ClassResourc
      */
     public function cgetAction()
     {
-        return $this->view (
-            $this->auteurRepository->findAll ()
-        );
+        $auteur=$this->getDoctrine ()->getManager ()
+            ->getRepository (Auteur::class)
+            ->findAll ();
+
+        return $this->view ($auteur,Response::HTTP_OK);
     }
 
     /**
