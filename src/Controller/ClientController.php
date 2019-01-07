@@ -135,4 +135,27 @@ class ClientController extends AbstractFOSRestController implements ClassResourc
         return $this->updateClient ($request,false);
     }
 
+////ici on passe aux routes de type "Subressources" de la ManyToMany Livre <--> Client
+//    /**
+//     * @param Request $request
+//     * @return \FOS\RestBundle\View\View
+//     * @Rest\View(serializerGroups={"livre","client"})
+//     * @Rest\get("client/{id}/livres")
+//     */
+//    public function getClientsLivresAction(Request $request)
+//    {
+//        return $this->view ($livres,Response::HTTP_OK);
+//    }
+//
+//    /**
+//     * @param Request $request
+//     * @return \FOS\RestBundle\View\View
+//     * @Rest\View(statusCode=Response::HTTP_CREATED,serializerGroups={"livre", "client"})
+//     * @Rest\Post("/client/{id}/livres")
+//     */
+//    public function postClientsLivresAction(Request $request)
+//    {
+//        return $this->view ( $livres , Response::HTTP_CREATED );
+//
+//    }
 }

@@ -50,11 +50,11 @@ class LivreController extends AbstractFOSRestController implements ClassResource
         }
     }
 
-     /**
+    /**
      * @param Request $request
      * @return \FOS\RestBundle\View\View
      * @Rest\View(serializerGroups={"livre"})
-      * @Rest\Get("/livre/{id}")
+     * @Rest\Get("/livre/{id}")
      */
     public function getAction(Request $request)
     {
@@ -111,7 +111,7 @@ class LivreController extends AbstractFOSRestController implements ClassResource
     {
         $em=$this->getDoctrine ()->getManager ();
         $livre=$em->getRepository (Livre::class)
-                ->find ($request->get('id'));
+            ->find ($request->get('id'));
 
         if(!empty($livre)) {
             $em->remove ($livre);
@@ -139,7 +139,8 @@ class LivreController extends AbstractFOSRestController implements ClassResource
         return $this->updateLivre ($request,false);
 
     }
-// on passe aux routes de type "sub ressources"
+
+// on passe aux routes de type "sub ressources" de la ManyToOne Livre <--> Auteur
 
     /**
      * @param Request $request
@@ -194,5 +195,30 @@ class LivreController extends AbstractFOSRestController implements ClassResource
             return $this->view ( $form , Response::HTTP_NOT_FOUND );
         }
     }
+//
+////ici on passe aux routes de type "Subressources" de la ManyToMany Livre <--> Client
+//    /**
+//     * @param Request $request
+//     * @return \FOS\RestBundle\View\View
+//     * @Rest\View(serializerGroups={"livre","client"})
+//     * @Rest\get("livre/{id}/clients")
+//     */
+//    public function getLivresClientsAction(Request $request)
+//    {
+//        return $this->view ($clients,Response::HTTP_OK);
+//    }
+//
+//    /**
+//     * @param Request $request
+//     * @return \FOS\RestBundle\View\View
+//     * @Rest\View(statusCode=Response::HTTP_CREATED,serializerGroups={"livre", "client"})
+//     * @Rest\Post("/livre/{id}/clients")
+//     */
+//    public function postLivresClientsAction(Request $request)
+//    {
+//       return $this->view ( $clients , Response::HTTP_CREATED );
+//
+//    }
+
 }
 
