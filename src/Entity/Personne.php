@@ -20,19 +20,19 @@ abstract class Personne
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
-     * @Groups("auteur")
+     *
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups("auteur")
+     *
      */
     private $nom;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups("auteur")
+     *
      */
     private $prenom;
 

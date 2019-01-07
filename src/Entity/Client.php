@@ -23,6 +23,11 @@ class Client extends Personne
      */
     private $dateDeNaissance;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="App\Entity\Livre", mappedBy="clients")
+     */
+    private $livres;
+
 
 
     public function __construct()
@@ -43,6 +48,34 @@ class Client extends Personne
     public function setDateDeNaissance(\DateTimeInterface $dateDeNaissance): self
     {
         $this->dateDeNaissance = $dateDeNaissance;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Livre[]
+     */
+    public function getLivres(): Collection
+    {
+        return $this->livres;
+    }
+
+    public function addLivre(Livre $livre): self
+    {
+        if (!$this->livres->contains($livre)) {
+            $this->livres[] = $livre;
+            $livre->addClient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeLivre(Livre $livre): self
+    {
+        if ($this->livres->contains($livre)) {
+            $this->livres->removeElement($livre);
+            $livre->removeClient($this);
+        }
 
         return $this;
     }
