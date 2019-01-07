@@ -26,106 +26,112 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class AuteurController extends AbstractFOSRestController implements ClassResourceInterface
 {
     /**
-     * @var EntityManagerInterface
+     * @param Request $request
+     * @param $clearmissing
+     * @return \FOS\RestBundle\View\View
      */
-    private $entityManager;
-
-    /**
-     * @var AuteurRepository
-     */
-    private $auteurRepository;
-
-    /**
-     * AuteurController constructor.
-     * @param EntityManagerInterface $entityManager
-     */
-    public function __construct (EntityManagerInterface $entityManager, AuteurRepository $auteurRepository)
+    private function updateAuteur(Request $request,$clearmissing)
     {
-        $this->entityManager = $entityManager;
-        $this->auteurRepository=$auteurRepository;
+        $auteur=$this->getDoctrine ()->getManager ()
+            ->getRepository (Auteur::class)
+            ->find ($request->get ('id'));
+        if(empty($auteur)){
+            return $this->view (null,Response::HTTP_NOT_FOUND);
+        }
+
+        $form=$this->createForm (AuteurType::class, $auteur);
+        $form->submit ($request->request->all (),$clearmissing);
+
+        if ($form->isValid ()) {
+            $em = $this->getDoctrine ()->getManager ();
+            $em->persist ($auteur);
+            $em->flush ();
+            return $this->view ( $auteur , Response::HTTP_OK);
+        }else{
+            return $this->view ($form, Response::HTTP_NOT_MODIFIED);
+        }
     }
 
     /**
-     * @param $id
-     * @return Auteur|null
+     * @param Request $request
+     * @return \FOS\RestBundle\View\View
+     * @Rest\View()
+     * @Rest\Get("/auteur/{id}")
      */
-    private function findAuteurById($id)
+    public function getAction(Request $request)
     {
-        $auteur = $this->auteurRepository->find ($id);
+        $auteur=$this->getDoctrine ()->getManager ()
+            ->getRepository (Auteur::class)
+            ->find ($request->get ('id'));
 
-        if(null===$auteur){
-            throw new NotFoundHttpException();
-        }
+        return $this->view ($auteur, Response::HTTP_OK);
+    }
 
-        return $auteur;
+    /**
+     * @return \FOS\RestBundle\View\View
+     * @Rest\View()
+     * @Rest\Get("/auteurs")
+     *
+     */
+    public function cgetAction()
+    {
+        $auteur=$this->getDoctrine ()->getManager ()
+            ->getRepository (Auteur::class)
+            ->findAll ();
+
+        return $this->view ($auteur,Response::HTTP_OK);
     }
 
     /**
      * @param Request $request
      * @return \FOS\RestBundle\View\View|Response
+     * @Rest\View(statusCode=Response::HTTP_CREATED)
+     * @Rest\Post("/auteur")
      */
     public function postAction(Request $request)
     {
-        $form=$this->createForm (AuteurType::class, new Auteur());
-
+        $auteur=new Auteur();
+        $form=$this->createForm (AuteurType::class, $auteur);
         $form->submit ($request->request->all());
 
-        if (false===$form->isValid()) {
-            return $this->handleView (
-                $this->view($form)
-            );
+        if ($form->isValid()) {
+            $em = $this->getDoctrine ()->getManager ();
+            $em->getRepository ( Auteur::class );
+            $em->persist ($auteur);
+            $em->flush ();
+
+            return $this->view ( $auteur , Response::HTTP_CREATED );
+        }else {
+            return $this->view ( $form );
         }
-
-        $this->entityManager->persist ($form->getData ());
-        $this->entityManager->flush ();
-
-        return $this->view (
-            [
-                'status' =>'ok',
-            ]
-        );
-    }
-
-    /**
-     * @param $id
-     * @return \FOS\RestBundle\View\View
-     */
-    public function getAction($id)
-    {
-        return $this->view (
-            $this->findAuteurById ($id)
-        );
-    }
-
-    /**
-     * @return \FOS\RestBundle\View\View
-     */
-    public function cgetAction()
-    {
-        return $this->view (
-            $this->auteurRepository->findAll ()
-        );
     }
 
     /**
      * @param Request $request
-     * @param $id
-     * @return \FOS\RestBundle\View\View
+     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT)
+     * @Rest\Delete("auteur/{id}")
      */
-    public function putAction(Request $request, $id)
+    public function deleteAction(Request $request)
     {
-        $existingAuteur=$this->findAuteurById ($id);
+        $em=$this->getDoctrine ()->getManager ();
+        $auteur=$em->getRepository (Auteur::class)
+            ->find ($request->get('id'));
 
-        $form=$this->createForm (AuteurType::class, $existingAuteur);
-        $form->submit ($request->request->all ());
-
-        if(false===$form->isValid ()){
-            return $this->view ($form);
+        if(!empty($auteur)) {
+            $em->remove ($auteur);
+            $em->flush ();
         }
+    }
 
-        $this->entityManager->flush ();
-
-        return $this->view (null, Response::HTTP_NO_CONTENT);
+    /**
+     * @param Request $request
+     * @return \FOS\RestBundle\View\View
+     * @Rest\View()
+     * @Rest\Put("/auteur/{id}"))
+     */
+    public function putAction(Request $request)
+    {
+        return $this->updateAuteur ($request, true);
     }
 
     /**
@@ -135,33 +141,7 @@ class AuteurController extends AbstractFOSRestController implements ClassResourc
      */
     public function patchAction(Request $request, string $id)
     {
-        $existingAuteur=$this->findAuteurById ($id);
-
-        $form=$this->createForm (AuteurType::class, $existingAuteur);
-        $form->submit ($request->request->all ());
-
-        if(false===$form->isValid ()){
-            return $this->view ($form);
-        }
-
-        $this->entityManager->flush ();
-
-        return $this->view (null, Response::HTTP_NO_CONTENT);
-    }
-  
-   /**
-     * @param string $id
-     * @return \FOS\RestBundle\View\View
-     */
-    public function deleteAction(string $id)
-    {
-        $auteur=$this->findAuteurById ($id);
-
-        $this->entityManager->remove ($auteur);
-        $this->entityManager->flush ();
-
-        return $this->view (null,Response::HTTP_NO_CONTENT);
-
+        return $this->updateAuteur ($request,false);
     }
 
 }

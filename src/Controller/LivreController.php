@@ -2,16 +2,15 @@
 
 namespace App\Controller;
 
+use App\Entity\Auteur;
 use App\Entity\Livre;
+use App\Form\AuteurType;
 use App\Form\LivreType;
-use App\Repository\LivreRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use FOS\RestBundle\Controller\AbstractFOSRestController;
 use FOS\RestBundle\Routing\ClassResourceInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use FOS\RestBundle\Controller\Annotations as Rest;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Class LivreController
@@ -23,144 +22,123 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
  */
 class LivreController extends AbstractFOSRestController implements ClassResourceInterface
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $entityManager;
 
     /**
-     * @var LivreRepository
+     * @param Request $request
+     * @param $clearmissing
+     * @return \FOS\RestBundle\View\View
      */
-    private $livreRepository;
-
-    /**
-     * LivreController constructor.
-     * @param EntityManagerInterface $entityManager
-     */
-    public function __construct (EntityManagerInterface $entityManager, LivreRepository $livreRepository)
+    private function updateLivre(Request $request,$clearmissing)
     {
-        $this->entityManager = $entityManager;
-        $this->livreRepository=$livreRepository;
+        $livre=$this->getDoctrine ()->getManager ()
+            ->getRepository (Livre::class)
+            ->find ($request->get ('id'));
+        if(empty($livre)){
+            return $this->view (null,Response::HTTP_NOT_FOUND);
+        }
+
+        $form=$this->createForm (LivreType::class, $livre);
+        $form->submit ($request->request->all (),$clearmissing);
+
+        if ($form->isValid ()) {
+            $em = $this->getDoctrine ()->getManager ();
+            $em->persist($livre);
+            $em->flush ();
+
+            return $this->view ( $livre , Response::HTTP_OK);
+        }else{
+            return $this->view ($form, Response::HTTP_NOT_MODIFIED);
+        }
+    }
+
+     /**
+     * @param Request $request
+     * @return \FOS\RestBundle\View\View
+     * @Rest\View()
+      * @Rest\Get("/livre/{id}")
+     */
+    public function getAction(Request $request)
+    {
+        $livre=$this->getDoctrine ()->getManager ()
+            ->getRepository (Livre::class)
+            ->find ($request->get ('id'));
+
+        return $this->view ($livre,Response::HTTP_OK);
     }
 
     /**
-     * @param $id
-     * @return Livre|null
+     * @return \FOS\RestBundle\View\View
+     * @Rest\View()
+     * @Rest\Get("/livres")
      */
-    private function findLivreById(string $id)
+    public function cgetAction()
     {
-         $livre = $this->livreRepository->find ($id);
-
-         if(null===$livre){
-             throw new NotFoundHttpException();
-         }
-
-         return $livre;
+        $livre=$this->getDoctrine ()->getManager ()
+            ->getRepository (Livre::class )
+            ->findAll ();
+        return $this->view ($livre, Response::HTTP_OK);
     }
-
-
 
     /**
      * @param Request $request
      * @return \FOS\RestBundle\View\View|Response
+     * @Rest\View(statusCode=Response::HTTP_CREATED)
+     * @Rest\Post("/livre")
      */
     public function postAction(Request $request)
     {
-        $form=$this->createForm (LivreType::class, new Livre());
-
+        $livre=new Livre();
+        $form=$this->createForm (LivreType::class, $livre);
         $form->submit ($request->request->all());
 
-        if (false===$form->isValid()) {
-            return $this->handleView (
-                $this->view($form)
-            );
+        if ($form->isValid()) {
+            $em = $this->getDoctrine ()->getManager ();
+            $em->getRepository ( Livre::class );
+            $em->persist ($livre);
+            $em->flush ();
+
+            return $this->view ( $livre , Response::HTTP_CREATED );
+        }else {
+            return $this->view ( $form );
         }
-
-        $this->entityManager->persist ($form->getData ());
-        $this->entityManager->flush ();
-
-        return $this->view (
-                [
-                    'status' =>'ok',
-                ]
-            );
-    }
-
-    /**
-     * @param $id
-     * @return \FOS\RestBundle\View\View
-     */
-    public function getAction(string $id)
-    {
-        return $this->view (
-            $this->findLivreById ($id)
-        );
-    }
-
-    /**
-     * @return \FOS\RestBundle\View\View
-     */
-    public function cgetAction()
-    {
-        return $this->view (
-            $this->livreRepository->findAll ()
-    );
     }
 
     /**
      * @param Request $request
-     * @param $id
-     * @return \FOS\RestBundle\View\View
+     * @Rest\View(statusCode=Response::HTTP_NO_CONTENT)
+     * @Rest\Delete("livre/{id}")
      */
-    public function putAction(Request $request, string $id)
+    public function deleteAction(Request $request)
     {
-        $existingLivre=$this->findLivreById ($id);
+        $em=$this->getDoctrine ()->getManager ();
+        $livre=$em->getRepository (Livre::class)
+                ->find ($request->get('id'));
 
-        $form=$this->createForm (LivreType::class, $existingLivre);
-        $form->submit ($request->request->all ());
-
-        if(false===$form->isValid ()){
-            return $this->view ($form);
+        if(!empty($livre)) {
+            $em->remove ($livre);
+            $em->flush ();
         }
-
-        $this->entityManager->flush ();
-
-        return $this->view (null, Response::HTTP_NO_CONTENT);
     }
 
     /**
      * @param Request $request
-     * @param string $id
      * @return \FOS\RestBundle\View\View
+     * @Rest\Put("/livre/{id}")
      */
-    public function patchAction(Request $request, string $id)
+    public function putAction(Request $request)
     {
-        $existingLivre=$this->findLivreById ($id);
-
-        $form=$this->createForm (LivreType::class, $existingLivre);
-        $form->submit ($request->request->all(), false);
-
-        if(false===$form->isValid ()){
-            return $this->view ($form);
-        }
-
-        $this->entityManager->flush ();
-
-        return $this->view (null, Response::HTTP_NO_CONTENT);
+        return $this->updateLivre ($request,true);
     }
-  
-   /**
-     * @param string $id
+
+    /**
+     * @param Request $request
      * @return \FOS\RestBundle\View\View
+     * @Rest\Patch("/livre/{id}")
      */
-    public function deleteAction(string $id)
+    public function patchAction(Request $request )
     {
-        $livre=$this->findLivreById ($id);
+        return $this->updateLivre ($request,false);
 
-        $this->entityManager->remove ($livre);
-        $this->entityManager->flush ();
-
-        return $this->view (null,Response::HTTP_NO_CONTENT);
     }
 
 }
